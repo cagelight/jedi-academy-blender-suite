@@ -635,11 +635,13 @@ class MdxmSurface:
 			self.triangles[0].indices = [ indexmap[ self.triangles[0][ i ] ] for i in range( 3 ) ]
 		"""
 		
-		#create vertices
+		#create vertices and normal list
 		mesh.vertices.add(self.numVerts)
+		vertex_normals = []
 		for vert, bvert in zip(self.vertices, mesh.vertices):
 			bvert.co = vert.co
 			bvert.normal = vert.normal
+			vertex_normals.append(vert.normal)
 		
 		# create faces
 		mesh.polygons.add( self.numTriangles )
@@ -671,6 +673,8 @@ class MdxmSurface:
 		mesh.validate()
 		mesh.update()
 		
+		mesh.normals_split_custom_set_from_vertices(vertex_normals)
+		mesh.use_auto_smooth = True
 		#  create object
 		obj = bpy.data.objects.new(blenderName, mesh)
 		

@@ -124,3 +124,44 @@ class CompBone:
 			round((loc.x+512)*64),
 			round((loc.y+512)*64),
 			round((loc.z+512)*64))
+
+class Tag:
+	def __init__(self):
+		self.transform = mathutils.Matrix()
+	
+	# [mathutils.Vector, mathutils.Vector, mathutils.Vector]
+	def computeFromTri(verts):
+		sides = []
+		axes = []
+		
+		for i in range(3):
+			sides.append(mathutils.Vector(0, 0, 0))
+			axes.append(mathutils.Vector(0, 0, 0))
+		
+		for i in range(3):
+			sides[i][0] = verts[(i+1)%3][0] - verts[i][0]
+			sides[i][1] = verts[(i+1)%3][1] - verts[i][1]
+			sides[i][2] = verts[(i+1)%3][2] - verts[i][2]
+			
+		axes[0] = sides[0].normalized()
+		axes[1] = sides[2].normalized()
+		d = axes[0].dot(axes[1])
+		for i in range(3):
+			axes[0][i] = axes[0][i] + -d * axes[1][i]
+		axes[0].normalize()
+		axes[2] = sides[0].cross(sides[1])
+		axes[2].normalize()
+		
+		self.transform = mathutils.Matrix()
+		self.transform[0][3] = verts[2][0]
+		self.transform[1][3] = verts[2][1]
+		self.transform[2][3] = verts[2][2]
+		self.transform[0][0] = axes[1][0]
+		self.transform[0][1] = axes[0][0]
+		self.transform[0][2] = -axes[2][0]
+		self.transform[1][0] = axes[1][1]
+		self.transform[1][1] = axes[0][1]
+		self.transform[1][2] = -axes[2][1]
+		self.transform[2][0] = axes[1][2]
+		self.transform[2][1] = axes[0][2]
+		self.transform[2][2] = -axes[2][2]
